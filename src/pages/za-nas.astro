@@ -1,0 +1,124 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import FAQ from "../components/FAQ.astro";
+import CTA from "../components/CTA.astro";
+import { site } from "../data/site";
+import { articleSchema, faqSchema } from "../data/schema";
+
+const faqs = [
+  {
+    question: "Vdiga отделна фирма ли е?",
+    answer:
+      "На този етап Vdiga е продукт, разработван и валидиран под Blast Off EOOD. Отделно OOD може да се създаде след платени пилоти и реален приход.",
+  },
+  {
+    question: "Защо не е създадена нова фирма още сега?",
+    answer:
+      "Новата фирма има смисъл след доказване на търсене. До тогава Blast Off EOOD дава реален правен оператор, фактуриране и публична отговорност.",
+  },
+  {
+    question: "Кой преглежда съдържанието?",
+    answer:
+      "Публичните страници трябва да минат човешка редакция преди финално публикуване. Числата се публикуват само с източник или собствено проучване.",
+  },
+  {
+    question: "Какво е Vdiga на английски?",
+    answer:
+      "Vdiga попада в категориите AI receptionist, AI answering service и voice AI assistant.",
+  },
+];
+---
+
+<BaseLayout
+  title="За нас — Vdiga by Blast Off EOOD"
+  description="Vdiga е AI рецепционист на български език, разработван от Blast Off EOOD, София."
+  path="/za-nas"
+  schemas={[faqSchema(faqs), articleSchema("За нас — Vdiga", "/za-nas", "Кой стои зад Vdiga и защо продуктът стартира под Blast Off EOOD.")]}
+>
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">За нас</p>
+      <h1>Vdiga е продукт на Blast Off EOOD, София.</h1>
+      <p class="answer-block">
+        Vdiga е AI (изкуствен интелект) рецепционист на български език, разработван от Blast Off EOOD, София. Към юли 2026 г. продуктът е във фаза 0: сайт, демо подготовка, 30 тестови разговора и проверка дали българският voice AI е достатъчно естествен.
+      </p>
+      <p class="lead">
+        Целта е проста: реален български телефонен асистент, който собственикът може да чуе, провери и после да включи към бизнеса си.
+      </p>
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="container grid-2">
+      <div>
+        <p class="eyebrow">Правен оператор</p>
+        <h2>Защо Vdiga стартира под съществуваща фирма?</h2>
+        <p>
+          Клиентите и търсачките търсят реална отговорност. Затова Vdiga започва под Blast Off EOOD за фактури, условия, политика за поверителност и публична проверимост.
+        </p>
+        <p>
+          Ако продуктът докаже търсене, може да се създаде отделно OOD и операциите да се прехвърлят чисто.
+        </p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Елемент</th>
+              <th>Първа версия</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Марка</td>
+              <td>Vdiga</td>
+            </tr>
+            <tr>
+              <td>Юридически оператор</td>
+              <td>{site.legalName}</td>
+            </tr>
+            <tr>
+              <td>Локация</td>
+              <td>{site.location}</td>
+            </tr>
+            <tr>
+              <td>Бъдещо OOD</td>
+              <td>само след платени пилоти или ясен приход</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container grid-2">
+      <div>
+        <p class="eyebrow">Автор и отговорност</p>
+        <h2>Кой пише и поддържа страниците?</h2>
+        <p>
+          Съдържанието на Vdiga следва строг writing bible: кратки изречения, без пълнеж, без измислени статистики и без преводно звучене.
+        </p>
+      </div>
+      <div class="author-box">
+        <div class="avatar">D</div>
+        <div>
+          <strong>{site.author.name}</strong>
+          <p style="margin: 4px 0 0;">{site.author.role}. {site.author.bio}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="container grid-2">
+      <div>
+        <p class="eyebrow">Чести въпроси</p>
+        <h2>Какво трябва да е ясно преди публикуване?</h2>
+      </div>
+      <FAQ items={faqs} />
+    </div>
+  </section>
+
+  <CTA title="Доверието започва преди първия разговор." text="Затова Vdiga показва кой стои зад продукта и какво още се тества." />
+</BaseLayout>

@@ -1,0 +1,22 @@
+---
+import { site } from "../data/site";
+---
+
+<div class="pricing-grid">
+  {
+    site.pricing.map((tier, index) => (
+      <article class:list={["price-card", index === 1 && "featured"]}>
+        <h3>{tier.name}</h3>
+        <p>{tier.note}</p>
+        <div class="price">
+          {tier.price} <small>{tier.suffix}</small>
+        </div>
+        <p>Ориентировъчна цена без окончателна оферта. ДДС се уточнява при фактура.</p>
+        <ul class="split-list">
+          {tier.features.map((feature) => <li>{feature}</li>)}
+        </ul>
+      </article>
+    ))
+  }
+</div>
+

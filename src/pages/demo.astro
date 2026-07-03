@@ -1,0 +1,125 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ProductVisual from "../components/ProductVisual.astro";
+import FAQ from "../components/FAQ.astro";
+import CTA from "../components/CTA.astro";
+import { articleSchema, faqSchema } from "../data/schema";
+
+const faqs = [
+  {
+    question: "Защо демо номерът още не е публичен?",
+    answer:
+      "Vdiga няма да показва фалшив демо номер. Първо се правят тестови разговори на български, после номерът става основният продавач на сайта.",
+  },
+  {
+    question: "Какво трябва да чуя в демото?",
+    answer:
+      "Трябва да чуете ясно представяне като AI асистент, естествен български, правилни въпроси, записване на час и нормално приключване на разговора.",
+  },
+  {
+    question: "Ще казва ли, че е AI?",
+    answer:
+      "Да. Vdiga трябва да се представя като AI асистент. Това е по-честно за клиента и по-чисто за правната рамка около запис и обработка на разговори.",
+  },
+  {
+    question: "Какво е AI receptionist на английски?",
+    answer:
+      "Това е AI receptionist или AI answering service. На български Vdiga използва термина AI рецепционист.",
+  },
+];
+---
+
+<BaseLayout
+  title="AI рецепционист демо — чуйте Vdiga"
+  description="Демо страница за Vdiga: как ще звучи AI рецепционистът на български и какъв тест трябва да мине преди публичен старт."
+  path="/demo"
+  schemas={[faqSchema(faqs), articleSchema("AI рецепционист демо — Vdiga", "/demo", "Как се тества AI рецепционист на български преди публичен старт.")]}
+>
+  <section class="hero">
+    <div class="container grid-2">
+      <div>
+        <p class="eyebrow">AI рецепционист демо</p>
+        <h1>Първо се обадете. После решавайте.</h1>
+        <p class="answer-block">
+          Демо номерът на Vdiga ще бъде публичен след 30 тестови разговора на български. Към юли 2026 г. целта е проста: собственикът да чуе AI (изкуствен интелект) рецепционист, който отговаря ясно, записва час и казва кога прехвърля към човек.
+        </p>
+        <p class="lead">
+          Няма форма за „консултация“. Няма търговски разговор. Демо номерът е продавачът. Ако звученето не минава теста, сайтът не се пуска като финален.
+        </p>
+      </div>
+      <ProductVisual />
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="container grid-2">
+      <div>
+        <p class="eyebrow">Сценарий</p>
+        <h2>Как трябва да започва разговорът?</h2>
+        <p>
+          Отварянето трябва да е кратко, честно и полезно. Клиентът трябва да разбере къде се обажда, че говори с AI асистент и какво може да направи веднага.
+        </p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Роля</th>
+              <th>Примерна реплика</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>AI</td>
+              <td>Здравейте, обаждате се на дентална клиника [име]. Аз съм AI асистентът на Vdiga и мога да ви запиша час.</td>
+            </tr>
+            <tr>
+              <td>Пациент</td>
+              <td>Имате ли свободно утре следобед?</td>
+            </tr>
+            <tr>
+              <td>AI</td>
+              <td>Ще проверя свободните часове. За преглед ли е, или имате болка?</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">Тестов праг</p>
+      <h2>Какво трябва да мине преди публичен номер?</h2>
+      <div class="grid-3">
+        <article class="feature">
+          <span class="num">01</span>
+          <h3>Естествен български</h3>
+          <p>Имена, часове, квартали и обичайни изрази трябва да звучат нормално за български клиент.</p>
+        </article>
+        <article class="feature">
+          <span class="num">02</span>
+          <h3>Правилно прекъсване</h3>
+          <p>AI асистентът трябва да се справя с клиент, който говори бързо, сменя тема или го прекъсва.</p>
+        </article>
+        <article class="feature">
+          <span class="num">03</span>
+          <h3>Ясна ескалация</h3>
+          <p>Когато има спешен или сложен случай, Vdiga не импровизира. Прехвърля или взема съобщение.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="container grid-2">
+      <div>
+        <p class="eyebrow">Чести въпроси</p>
+        <h2>Какво трябва да знаете преди първото обаждане?</h2>
+      </div>
+      <FAQ items={faqs} />
+    </div>
+  </section>
+
+  <CTA title="Демото не е украшение. То е продажбата." text="Когато номерът е готов, всяка ключова страница ще води към него." />
+</BaseLayout>

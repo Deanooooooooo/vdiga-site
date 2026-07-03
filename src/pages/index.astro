@@ -1,0 +1,147 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ProductVisual from "../components/ProductVisual.astro";
+import PricingCards from "../components/PricingCards.astro";
+import FAQ from "../components/FAQ.astro";
+import CTA from "../components/CTA.astro";
+import { articleSchema, faqSchema, productSchema } from "../data/schema";
+
+const faqs = [
+  {
+    question: "Какво е AI рецепционист?",
+    answer:
+      "AI рецепционист е телефонен асистент, който отговаря на входящи обаждания, задава уточняващи въпроси и записва часове според правилата на бизнеса ви.",
+  },
+  {
+    question: "Vdiga говори ли на български?",
+    answer:
+      "Vdiga се планира като български-first AI рецепционист. Публичният старт ще мине през тестови разговори, за да се провери естественото звучене на български.",
+  },
+  {
+    question: "Кой стои зад Vdiga?",
+    answer:
+      "Vdiga се разработва от Blast Off EOOD, София. Това е реалният правен оператор за сайта, фактурите, условията и политиките до отделно дружество след валидация.",
+  },
+  {
+    question: "Как се казва това на английски?",
+    answer:
+      "На английски най-често се използват AI receptionist, AI answering service и voice AI assistant. Българският термин, който Vdiga използва, е AI рецепционист.",
+  },
+];
+---
+
+<BaseLayout
+  title="AI рецепционист — Vdiga"
+  description="Vdiga е AI рецепционист на български език за обаждания 24/7, записване на часове и обобщения след разговор."
+  path="/"
+  schemas={[faqSchema(faqs), productSchema(), articleSchema("AI рецепционист — Vdiga", "/", "AI рецепционист на български език за клиники, салони и услуги.")]}
+>
+  <section class="hero">
+    <div class="container grid-2">
+      <div>
+        <p class="eyebrow">AI рецепционист за български бизнеси</p>
+        <h1>Кой ви вдига телефона, когато вие не можете?</h1>
+        <p class="answer-block">
+          Vdiga е AI (изкуствен интелект) рецепционист на български език, който вдига телефона 24/7, записва часове и праща обобщение след разговора. Към юли 2026 г. плановете започват от 75 евро/месец, а публичният демо номер се добавя след първите Retell/Twilio тестове.
+        </p>
+        <p class="lead">
+          Клиентът не чака удобен момент. Той звъни, пита и решава. Vdiga отговаря, когато екипът ви работи, почива или е с друг клиент.
+        </p>
+        <div class="button-row">
+          <a class="btn btn-primary" href="/demo">Чуйте демото</a>
+          <a class="btn btn-secondary" href="/tseni">Вижте цените</a>
+        </div>
+        <div class="hero-meta">
+          <span class="meta-pill">24/7 входящи обаждания</span>
+          <span class="meta-pill">записване на часове</span>
+          <span class="meta-pill">Vdiga by Blast Off EOOD</span>
+        </div>
+      </div>
+      <ProductVisual />
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="container">
+      <p class="eyebrow">Какво решава?</p>
+      <h2>Какво става с обаждането, когато никой не вдигне?</h2>
+      <div class="grid-3">
+        <article class="feature">
+          <span class="num">01</span>
+          <h3>Vdiga отговаря</h3>
+          <p>AI асистентът приема входящото обаждане и казва ясно, че е AI асистент. Клиентът получава отговор вместо тишина.</p>
+        </article>
+        <article class="feature">
+          <span class="num">02</span>
+          <h3>Vdiga записва</h3>
+          <p>При свободен час AI рецепционистът събира нужните данни и записва клиента според правилата ви.</p>
+        </article>
+        <article class="feature">
+          <span class="num">03</span>
+          <h3>Vdiga обобщава</h3>
+          <p>След разговора получавате кратко обобщение. Виждате кой се е обадил, какво е поискал и какво е направено.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container grid-2">
+      <div>
+        <p class="eyebrow">За кого е?</p>
+        <h2>Къде Vdiga има най-много смисъл?</h2>
+        <p>
+          Най-силен е при бизнеси, където едно пропуснато обаждане може да значи пропуснат час. Първите шаблони са за дентални клиники, медицински центрове и салони за красота.
+        </p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Бизнес</th>
+              <th>Какво пита клиентът</th>
+              <th>Какво прави Vdiga</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Дентална клиника</td>
+              <td>„Имате ли час утре?“</td>
+              <td>Проверява календар и записва посещение.</td>
+            </tr>
+            <tr>
+              <td>Медицински център</td>
+              <td>„Кога приема докторът?“</td>
+              <td>Отговаря по правила и прехвърля сложните случаи.</td>
+            </tr>
+            <tr>
+              <td>Салон за красота</td>
+              <td>„Свободно ли е в петък?“</td>
+              <td>Намира свободен час и праща потвърждение.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="container">
+      <p class="eyebrow">Цени</p>
+      <h2>Колко струва AI рецепционистът?</h2>
+      <PricingCards />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container grid-2">
+      <div>
+        <p class="eyebrow">Чести въпроси</p>
+        <h2>Какво ще поиска собственикът да знае първо?</h2>
+      </div>
+      <FAQ items={faqs} />
+    </div>
+  </section>
+
+  <CTA />
+</BaseLayout>

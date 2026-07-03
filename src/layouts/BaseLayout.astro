@@ -1,0 +1,52 @@
+---
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { organizationSchema, breadcrumbSchema } from "../data/schema";
+import { site } from "../data/site";
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  schemas?: Record<string, unknown>[];
+}
+
+const { title, description, path, schemas = [] } = Astro.props;
+const canonical = `${site.url}${path}`;
+const allSchemas = [
+  organizationSchema(),
+  breadcrumbSchema([
+    { name: "Начало", href: "/" },
+    ...(path === "/" ? [] : [{ name: title.replace(` | ${site.brand}`, ""), href: path }]),
+  ]),
+  ...schemas,
+];
+---
+
+<!doctype html>
+<html lang="bg">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {allSchemas.map((schema) => <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />)}
+  </head>
+  <body>
+    <div class="page-shell">
+      <Header />
+      <main>
+        <slot />
+      </main>
+      <Footer />
+    </div>
+  </body>
+</html>

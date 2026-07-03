@@ -1,0 +1,45 @@
+---
+const heights = [32, 48, 24, 58, 40, 68, 34, 52, 28, 62, 42, 54, 30, 46, 64, 36, 56, 26, 50, 66, 38, 48, 30, 60];
+---
+
+<div class="product-visual" aria-label="Примерен екран на Vdiga">
+  <div class="phone-panel">
+    <div class="panel-top">
+      <strong>Входящо обаждане</strong>
+      <span class="status">AI отговаря</span>
+    </div>
+    <div class="call-screen">
+      <p style="margin-bottom: 6px; color: rgba(255,255,255,.58);">18:40 ч. след работно време</p>
+      <h3 style="color: #fff; margin-bottom: 8px;">„Имате ли свободен час утре?“</h3>
+      <p>Vdiga проверява календара и записва пациента без да ви прекъсва.</p>
+      <div class="wave" aria-hidden="true">
+        {heights.map((height) => <span style={`--h:${height}px`}></span>)}
+      </div>
+      <div class="call-actions">
+        <span>час записан</span>
+        <span>SMS пратен</span>
+      </div>
+    </div>
+  </div>
+  <div class="ops-panel">
+    <div class="panel-top">
+      <strong>Обобщение към собственика</strong>
+      <span class="status">готово</span>
+    </div>
+    <div class="timeline">
+      <div class="timeline-row">
+        <strong>Клиент</strong>
+        <span>Мария Петрова, нов пациент, болка от вчера.</span>
+      </div>
+      <div class="timeline-row">
+        <strong>Действие</strong>
+        <span>Записан час за утре в 11:30 ч. Потвърдено по SMS.</span>
+      </div>
+      <div class="timeline-row">
+        <strong>Ескалация</strong>
+        <span>Не е нужна. Обаждането е приключено нормално.</span>
+      </div>
+    </div>
+  </div>
+</div>
+

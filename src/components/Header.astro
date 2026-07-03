@@ -1,0 +1,17 @@
+---
+import { site } from "../data/site";
+---
+
+<header class="header">
+  <div class="container nav">
+    <a class="brand" href="/" aria-label="Vdiga начало">
+      <span class="brand-mark">V</span>
+      <span>Vdiga</span>
+    </a>
+    <nav class="nav-links" aria-label="Основна навигация">
+      {site.nav.map((item) => <a href={item.href}>{item.label}</a>)}
+    </nav>
+    <a class="btn btn-secondary" href="/demo">Чуйте демото</a>
+  </div>
+</header>
+

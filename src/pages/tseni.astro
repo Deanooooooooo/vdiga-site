@@ -1,0 +1,110 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PricingCards from "../components/PricingCards.astro";
+import FAQ from "../components/FAQ.astro";
+import CTA from "../components/CTA.astro";
+import { articleSchema, faqSchema, productSchema } from "../data/schema";
+
+const faqs = [
+  {
+    question: "Цените с ДДС ли са?",
+    answer:
+      "Цените са работна хипотеза за стартовия сайт. При публична оферта Vdiga ще показва ясно дали сумите са с ДДС или без ДДС.",
+  },
+  {
+    question: "Има ли договор?",
+    answer:
+      "Планираният модел е месечен абонамент без дълъг договор. Собственикът трябва да може да спре, ако Vdiga не носи реална стойност.",
+  },
+  {
+    question: "Има ли такса за настройка?",
+    answer:
+      "Да. Работната рамка е 150-250 евро за първоначална настройка, според сложността на календара, FAQ базата и правилата за прехвърляне.",
+  },
+  {
+    question: "Как се казва услугата на английски?",
+    answer:
+      "Английските термини са AI receptionist, AI answering service и voice AI assistant. На български Vdiga използва AI рецепционист.",
+  },
+];
+---
+
+<BaseLayout
+  title="AI рецепционист цена — от 75 евро | Vdiga"
+  description="Цени за AI рецепционист Vdiga: 75-100 евро, 150 евро и 200-250 евро/месец според обема и функциите."
+  path="/tseni"
+  schemas={[faqSchema(faqs), productSchema(), articleSchema("AI рецепционист цена — Vdiga", "/tseni", "Ориентировъчни цени за AI рецепционист на български език.")]}
+>
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">AI рецепционист цена</p>
+      <h1>Цени — AI рецепционист от 75 евро/месец</h1>
+      <p class="answer-block">
+        Към юли 2026 г. Vdiga планира три нива за AI (изкуствен интелект) рецепционист: 75-100 евро за стартов обем, 150 евро за 24/7 отговори със записване на часове и 200-250 евро за многоезични клиники. Първоначалната настройка е планирана на 150-250 евро.
+      </p>
+      <p class="lead">
+        Цената трябва да е по-лесна от наемането на човек и по-ясна от агенционна оферта. Затова плановете са кратки, месечни и обвързани с реалната работа на телефона.
+      </p>
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="container">
+      <PricingCards />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container grid-2">
+      <div>
+        <p class="eyebrow">Какво не плащате?</p>
+        <h2>Какво отпада, когато телефонът се поема от AI?</h2>
+        <ul class="split-list">
+          <li>Не плащате заплата за човек, който чака телефонът да звънне.</li>
+          <li>Не губите обаждания след работно време.</li>
+          <li>Не поддържате отделна система за първични записвания.</li>
+        </ul>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Разход</th>
+              <th>Човешки рецепционист</th>
+              <th>Vdiga</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Месечен разход</td>
+              <td>заплата, осигуровки, отпуск</td>
+              <td>от 75 евро/месец</td>
+            </tr>
+            <tr>
+              <td>Работно време</td>
+              <td>ограничено по график</td>
+              <td>24/7 за входящи обаждания</td>
+            </tr>
+            <tr>
+              <td>Сложни случаи</td>
+              <td>решават се от екипа</td>
+              <td>прехвърлят се към вас</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="container grid-2">
+      <div>
+        <p class="eyebrow">Въпроси за плащане</p>
+        <h2>Какво се уточнява преди първата фактура?</h2>
+      </div>
+      <FAQ items={faqs} />
+    </div>
+  </section>
+
+  <CTA title="Първо чуйте демото. После гледайте цената." text="AI рецепционистът трябва да звучи достатъчно добре, преди да има смисъл да спорим за планове." />
+</BaseLayout>

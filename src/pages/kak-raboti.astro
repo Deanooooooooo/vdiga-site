@@ -1,0 +1,144 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import FAQ from "../components/FAQ.astro";
+import CTA from "../components/CTA.astro";
+import { articleSchema, faqSchema } from "../data/schema";
+
+const faqs = [
+  {
+    question: "Колко време отнема настройката?",
+    answer:
+      "Целта на Vdiga е тестов AI рецепционист да се подготвя до 10 минути след подаване на сайт, Google профил или Facebook страница.",
+  },
+  {
+    question: "С какъв календар работи v1?",
+    answer:
+      "Първата версия е планирана с Cal.com API. Това държи настройката по-проста от Google OAuth поток за всеки клиент.",
+  },
+  {
+    question: "Какво става при спешен случай?",
+    answer:
+      "Vdiga следва предварително зададени правила. При спешен или неясен случай AI асистентът прехвърля, взема съобщение или маркира разговора за човешка реакция.",
+  },
+  {
+    question: "Как се казва това на английски?",
+    answer:
+      "Най-близките английски термини са AI receptionist, voice AI assistant и AI answering service.",
+  },
+];
+---
+
+<BaseLayout
+  title="Как работи AI рецепционист — Vdiga"
+  description="Как работи Vdiga: приемане на обаждане, проверка на свободни часове, записване, SMS и обобщение към собственика."
+  path="/kak-raboti"
+  schemas={[faqSchema(faqs), articleSchema("Как работи AI рецепционист — Vdiga", "/kak-raboti", "Стъпка по стъпка как AI рецепционист отговаря и записва часове.")]}
+>
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">Как работи AI рецепционист</p>
+      <h1>От звънене до записан час, без да прекъсва екипа ви.</h1>
+      <p class="answer-block">
+        Vdiga работи като AI (изкуствен интелект) рецепционист, който приема входящото обаждане, проверява правилата ви, записва час в календар и праща обобщение след разговора. Към юли 2026 г. v1 е планирана около Retell AI, Twilio и Cal.com API.
+      </p>
+      <p class="lead">
+        Собственикът не трябва да учи нова система, за да чуе първи резултат. Vdiga взема публичната информация, превръща я в правила и прави тестови разговори преди реални клиенти.
+      </p>
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="container">
+      <p class="eyebrow">Поток</p>
+      <h2>Какво се случва при едно входящо обаждане?</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Стъпка</th>
+              <th>Какво прави Vdiga</th>
+              <th>Какво виждате вие</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1. Отговор</td>
+              <td>Вдига телефона и се представя като AI асистент.</td>
+              <td>Няма пропуснато първо обаждане.</td>
+            </tr>
+            <tr>
+              <td>2. Уточнение</td>
+              <td>Пита за услуга, спешност, име и удобен час.</td>
+              <td>Получавате чиста информация, не записки на ръка.</td>
+            </tr>
+            <tr>
+              <td>3. Календар</td>
+              <td>Проверява свободни часове според правилата.</td>
+              <td>Календарът остава източникът на истината.</td>
+            </tr>
+            <tr>
+              <td>4. Обобщение</td>
+              <td>Праща кратък запис на резултата след разговора.</td>
+              <td>Виждате какво е станало, без да слушате целия разговор.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container grid-2">
+      <div>
+        <p class="eyebrow">Настройка</p>
+        <h2>Как Vdiga разбира вашия бизнес?</h2>
+        <p>
+          Първата настройка не започва от празен чат. Vdiga използва сайта, Google профила или Facebook страницата ви, за да извлече услуги, работно време, цени, адрес и правила.
+        </p>
+      </div>
+      <div>
+        <ol class="split-list">
+          <li>Подавате сайт, Google профил или Facebook страница.</li>
+          <li>Системата създава профил, FAQ база и правила за ескалация.</li>
+          <li>Пускат се 3 тестови разговора преди реален трафик.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="container">
+      <p class="eyebrow">Интеграции</p>
+      <h2>Кои части са планирани за първата версия?</h2>
+      <div class="grid-3">
+        <article class="feature">
+          <span class="num">01</span>
+          <h3>Retell AI</h3>
+          <p>Гласовият разговор се отдава на готов voice AI stack. Vdiga не строи реално-времеви глас от нулата.</p>
+        </article>
+        <article class="feature">
+          <span class="num">02</span>
+          <h3>Twilio</h3>
+          <p>Телефонният слой минава през Twilio и български номер, когато регулаторният пакет е готов.</p>
+        </article>
+        <article class="feature">
+          <span class="num">03</span>
+          <h3>Cal.com</h3>
+          <p>Свободните часове се проверяват през Cal.com API. Така v1 не зависи от Google OAuth за всеки клиент.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container grid-2">
+      <div>
+        <p class="eyebrow">Чести въпроси</p>
+        <h2>Какво пита собственикът преди настройка?</h2>
+      </div>
+      <FAQ items={faqs} />
+    </div>
+  </section>
+
+  <CTA title="Първо работещ тест. После реални клиенти." text="Vdiga няма да се продава с презентация. Първо трябва да мине разговорите." />
+</BaseLayout>

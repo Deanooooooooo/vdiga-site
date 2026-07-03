@@ -1,0 +1,22 @@
+---
+import { site } from "../data/site";
+---
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <div>
+      <a class="brand" href="/">
+        <span class="brand-mark">V</span>
+        <span>Vdiga</span>
+      </a>
+      <p style="max-width: 620px; margin: 18px 0 0;">
+        {site.descriptor} Юридически оператор: {site.legalName}. Публичният демо номер се добавя след
+        първите Retell/Twilio тестове.
+      </p>
+    </div>
+    <div class="footer-links">
+      {site.nav.map((item) => <a href={item.href}>{item.label}</a>)}
+    </div>
+  </div>
+</footer>
+
