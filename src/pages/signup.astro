@@ -1,0 +1,133 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Регистрация | Vdiga"
+  description="Създайте профил във Vdiga, за да активирате AI телефонен асистент за вашия бизнес."
+  path="/signup"
+>
+  <section class="section auth-section">
+    <div class="container auth-wrap">
+      <div>
+        <p class="eyebrow">Vdiga app</p>
+        <h1>Създайте бизнес профил</h1>
+        <p class="lead">
+          Регистрацията е първата стъпка към защитен dashboard за AI асистента, forwarding номера,
+          разговорите и записванията.
+        </p>
+      </div>
+
+      <form class="auth-panel" data-auth-form="signup">
+        <label>
+          Email
+          <input required type="email" name="email" autocomplete="email" placeholder="you@example.com" />
+        </label>
+        <label>
+          Парола
+          <input required minlength="8" type="password" name="password" autocomplete="new-password" />
+        </label>
+        <button class="btn btn-primary" type="submit">Създай профил</button>
+        <p class="auth-message" data-auth-message></p>
+        <p class="auth-alt">Вече имате профил? <a href="/login">Вход</a></p>
+      </form>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { supabase, isSupabaseConfigured } from "../lib/supabase";
+
+  const form = document.querySelector<HTMLFormElement>('[data-auth-form="signup"]');
+  const message = document.querySelector<HTMLElement>("[data-auth-message]");
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!message) return;
+    if (!supabase || !isSupabaseConfigured) {
+      message.textContent = "Supabase още не е конфигуриран.";
+      return;
+    }
+
+    const formData = new FormData(form);
+    const email = String(formData.get("email") || "");
+    const password = String(formData.get("password") || "");
+
+    message.textContent = "Създаваме профила...";
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/app`,
+      },
+    });
+
+    if (error) {
+      message.textContent = error.message;
+      return;
+    }
+
+    message.textContent = "Профилът е създаден. Проверете email-а си, ако Supabase изисква потвърждение.";
+  });
+</script>
+
+<style>
+  .auth-section {
+    min-height: calc(100vh - 72px);
+    display: grid;
+    align-items: center;
+  }
+
+  .auth-wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+    gap: 44px;
+    align-items: center;
+  }
+
+  .auth-panel {
+    display: grid;
+    gap: 16px;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--white);
+    box-shadow: var(--shadow);
+  }
+
+  label {
+    display: grid;
+    gap: 7px;
+    color: #2a323b;
+    font-weight: 700;
+  }
+
+  input {
+    width: 100%;
+    min-height: 46px;
+    padding: 10px 12px;
+    border: 1px solid #bdc8d4;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--ink);
+  }
+
+  .auth-message,
+  .auth-alt {
+    margin: 0;
+    font-size: 0.94rem;
+  }
+
+  .auth-alt a {
+    color: var(--green);
+    font-weight: 760;
+  }
+
+  @media (max-width: 780px) {
+    .auth-wrap {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+

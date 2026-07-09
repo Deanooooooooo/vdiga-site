@@ -1,0 +1,127 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Вход | Vdiga"
+  description="Влезте във Vdiga dashboard, за да управлявате AI телефонния асистент за вашия бизнес."
+  path="/login"
+>
+  <section class="section auth-section">
+    <div class="container auth-wrap">
+      <div>
+        <p class="eyebrow">Vdiga app</p>
+        <h1>Вход в dashboard</h1>
+        <p class="lead">
+          Управлявайте статуса на AI асистента, разговорите, lead-овете, forwarding номера и calendar
+          настройките за вашия бизнес.
+        </p>
+      </div>
+
+      <form class="auth-panel" data-auth-form="login">
+        <label>
+          Email
+          <input required type="email" name="email" autocomplete="email" placeholder="you@example.com" />
+        </label>
+        <label>
+          Парола
+          <input required type="password" name="password" autocomplete="current-password" />
+        </label>
+        <button class="btn btn-primary" type="submit">Вход</button>
+        <p class="auth-message" data-auth-message></p>
+        <p class="auth-alt">Нямате профил? <a href="/signup">Регистрация</a></p>
+      </form>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { supabase, isSupabaseConfigured } from "../lib/supabase";
+
+  const form = document.querySelector<HTMLFormElement>('[data-auth-form="login"]');
+  const message = document.querySelector<HTMLElement>("[data-auth-message]");
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!message) return;
+    if (!supabase || !isSupabaseConfigured) {
+      message.textContent = "Supabase още не е конфигуриран.";
+      return;
+    }
+
+    const formData = new FormData(form);
+    const email = String(formData.get("email") || "");
+    const password = String(formData.get("password") || "");
+
+    message.textContent = "Влизаме...";
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      message.textContent = error.message;
+      return;
+    }
+
+    window.location.assign("/app");
+  });
+</script>
+
+<style>
+  .auth-section {
+    min-height: calc(100vh - 72px);
+    display: grid;
+    align-items: center;
+  }
+
+  .auth-wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+    gap: 44px;
+    align-items: center;
+  }
+
+  .auth-panel {
+    display: grid;
+    gap: 16px;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--white);
+    box-shadow: var(--shadow);
+  }
+
+  label {
+    display: grid;
+    gap: 7px;
+    color: #2a323b;
+    font-weight: 700;
+  }
+
+  input {
+    width: 100%;
+    min-height: 46px;
+    padding: 10px 12px;
+    border: 1px solid #bdc8d4;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--ink);
+  }
+
+  .auth-message,
+  .auth-alt {
+    margin: 0;
+    font-size: 0.94rem;
+  }
+
+  .auth-alt a {
+    color: var(--green);
+    font-weight: 760;
+  }
+
+  @media (max-width: 780px) {
+    .auth-wrap {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+

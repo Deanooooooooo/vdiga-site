@@ -1,0 +1,873 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Dashboard | Vdiga"
+  description="Vdiga dashboard за AI телефонен асистент, разговори, lead-ове, календар и настройки."
+  path="/app"
+>
+  <section class="section app-section">
+    <div class="container app-wrap">
+      <div class="app-heading">
+        <p class="eyebrow">Vdiga dashboard</p>
+        <h1>Контролен панел</h1>
+        <p class="lead" data-app-status>Проверяваме сесията...</p>
+      </div>
+
+      <form class="onboarding-panel" hidden data-onboarding-form>
+        <div>
+          <p class="eyebrow">Първа настройка</p>
+          <h2>Данни за бизнеса</h2>
+          <p>Тези данни ще създадат tenant профила, към който после ще вържем subscription, DIDWW и Retell.</p>
+        </div>
+
+        <label>
+          Име на бизнес
+          <input required name="business_name" autocomplete="organization" placeholder="Дентална клиника Иванови" />
+        </label>
+
+        <label>
+          Ниша
+          <select name="niche">
+            <option value="">Изберете ниша</option>
+            <option value="dental">Зъболекар / дентална клиника</option>
+            <option value="clinic">Клиника / медицински услуги</option>
+            <option value="beauty">Салон / beauty</option>
+            <option value="auto_service">Автосервиз</option>
+            <option value="real_estate">Имоти</option>
+            <option value="hotel">Хотел / туризъм</option>
+            <option value="general_services">Услуги</option>
+          </select>
+        </label>
+
+        <label>
+          Град
+          <input name="city" autocomplete="address-level2" placeholder="София" />
+        </label>
+
+        <label>
+          Бизнес телефон
+          <input name="main_phone" autocomplete="tel" placeholder="+359..." />
+        </label>
+
+        <label>
+          Контактен email
+          <input name="contact_email" type="email" autocomplete="email" placeholder="office@example.com" />
+        </label>
+
+        <label class="checkbox-label">
+          <input name="wants_booking" type="checkbox" />
+          Искам записване на часове през календар
+        </label>
+
+        <button class="btn btn-primary" type="submit">Създай бизнес профил</button>
+        <p class="app-message" data-onboarding-message></p>
+      </form>
+
+      <div class="app-grid" hidden data-app-content>
+        <article class="plan-panel" data-plan-panel>
+          <div>
+            <span class="panel-label">Абонамент</span>
+            <h2>Изберете план</h2>
+            <p data-plan-status>Планът още не е избран.</p>
+          </div>
+
+          <div class="plan-list">
+            <button class="plan-option" type="button" data-plan-key="start">
+              <strong>Старт</strong>
+              <span>AI отговор 24/7 и call summaries</span>
+            </button>
+            <button class="plan-option" type="button" data-plan-key="booking">
+              <strong>24/7 + часове</strong>
+              <span>AI разговори + записване в календар</span>
+            </button>
+            <button class="plan-option" type="button" data-plan-key="multilingual">
+              <strong>Многоезичен</strong>
+              <span>Български + английски и premium setup</span>
+            </button>
+          </div>
+        </article>
+
+        <article class="app-panel">
+          <span class="panel-label">Статус</span>
+          <h2>AI асистент</h2>
+          <p data-provisioning-status>Provisioning още не е стартиран.</p>
+        </article>
+
+        <article class="app-panel">
+          <span class="panel-label">Телефония</span>
+          <h2>Forwarding номер</h2>
+          <p data-phone-status>Зареждаме телефонната настройка...</p>
+        </article>
+
+        <article class="app-panel call-history-panel">
+          <span class="panel-label">Разговори</span>
+          <h2>Call history</h2>
+          <p data-call-status>Зареждаме последните разговори...</p>
+          <div class="call-list" data-call-list></div>
+        </article>
+
+        <article class="app-panel lead-panel">
+          <span class="panel-label">Lead-ове</span>
+          <h2>Нови заявки</h2>
+          <p data-lead-status>Зареждаме заявките от разговорите...</p>
+          <div class="lead-list" data-lead-list></div>
+        </article>
+
+        <article class="app-panel calendar-panel">
+          <span class="panel-label">Calendar</span>
+          <h2>Записвания</h2>
+          <p data-calendar-status>Зареждаме calendar setup...</p>
+
+          <div class="calendar-provider-grid" data-calendar-providers>
+            <button type="button" data-calendar-provider="google_calendar">
+              <strong>Google Calendar</strong>
+              <span>Свържете един или повече Google календари за хора, стаи или ресурси.</span>
+            </button>
+          </div>
+
+          <div class="calendar-connection" hidden data-calendar-connection></div>
+
+          <p class="app-message" data-calendar-message></p>
+        </article>
+      </div>
+
+      <button class="btn btn-secondary" type="button" hidden data-logout>Изход</button>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { supabase, isSupabaseConfigured } from "../lib/supabase";
+
+  const status = document.querySelector<HTMLElement>("[data-app-status]");
+  const content = document.querySelector<HTMLElement>("[data-app-content]");
+  const logout = document.querySelector<HTMLButtonElement>("[data-logout]");
+  const onboardingForm = document.querySelector<HTMLFormElement>("[data-onboarding-form]");
+  const onboardingMessage = document.querySelector<HTMLElement>("[data-onboarding-message]");
+  const planStatus = document.querySelector<HTMLElement>("[data-plan-status]");
+  const planButtons = document.querySelectorAll<HTMLButtonElement>("[data-plan-key]");
+  const provisioningStatus = document.querySelector<HTMLElement>("[data-provisioning-status]");
+  const phoneStatus = document.querySelector<HTMLElement>("[data-phone-status]");
+  const callStatus = document.querySelector<HTMLElement>("[data-call-status]");
+  const callList = document.querySelector<HTMLElement>("[data-call-list]");
+  const leadStatus = document.querySelector<HTMLElement>("[data-lead-status]");
+  const leadList = document.querySelector<HTMLElement>("[data-lead-list]");
+  const calendarStatus = document.querySelector<HTMLElement>("[data-calendar-status]");
+  const calendarProviders = document.querySelector<HTMLElement>("[data-calendar-providers]");
+  const calendarProviderButtons = document.querySelectorAll<HTMLButtonElement>("[data-calendar-provider]");
+  const calendarConnection = document.querySelector<HTMLElement>("[data-calendar-connection]");
+  const calendarMessage = document.querySelector<HTMLElement>("[data-calendar-message]");
+  let activeTenantId: string | null = null;
+
+  const setStatus = (value: string) => {
+    if (status) status.textContent = value;
+  };
+
+  const formatDateTime = (value?: string | null) => {
+    if (!value) return "няма дата";
+    return new Intl.DateTimeFormat("bg-BG", {
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(new Date(value));
+  };
+
+  const renderEmptyState = (element: HTMLElement | null, message: string) => {
+    if (!element) return;
+    element.innerHTML = `<p class="empty-state">${message}</p>`;
+  };
+
+  const escapeHtml = (value: string) => {
+    const div = document.createElement("div");
+    div.textContent = value;
+    return div.innerHTML;
+  };
+
+  const setCalendarMessage = (value: string) => {
+    if (calendarMessage) calendarMessage.textContent = value;
+  };
+
+  const startGoogleCalendarAuth = async (mode = "solo_google") => {
+    if (!supabase || !activeTenantId) return;
+
+    setCalendarMessage("Подготвяме Google OAuth...");
+    const { data, error } = await supabase.functions.invoke("google-calendar-auth-start", {
+      body: {
+        tenant_id: activeTenantId,
+        mode,
+      },
+    });
+
+    if (error) {
+      setCalendarMessage("Google OAuth endpoint още не е конфигуриран. UI и базата са готови за връзката.");
+      return;
+    }
+
+    const authUrl = typeof data === "object" && data && "auth_url" in data ? String(data.auth_url) : "";
+    if (!authUrl) {
+      setCalendarMessage("Google OAuth endpoint не върна auth URL.");
+      return;
+    }
+
+    window.location.assign(authUrl);
+  };
+
+  const loadPhoneNumbers = async (tenantId: string) => {
+    if (!supabase || !phoneStatus) return;
+
+    const { data: numbers, error } = await supabase
+      .from("phone_numbers")
+      .select("didww_number, retell_phone_number, original_business_number, status, last_test_call_at")
+      .eq("tenant_id", tenantId)
+      .order("updated_at", { ascending: false })
+      .limit(1);
+
+    if (error) {
+      phoneStatus.textContent = `Не успяхме да заредим номера: ${error.message}`;
+      return;
+    }
+
+    const number = numbers?.[0];
+    if (!number) {
+      phoneStatus.textContent = "Няма записан forwarding номер още.";
+      return;
+    }
+
+    phoneStatus.textContent = `DID: ${number.didww_number || number.retell_phone_number || "няма"} · статус: ${number.status}`;
+  };
+
+  const loadCalls = async (tenantId: string) => {
+    if (!supabase || !callStatus || !callList) return;
+
+    const { data: calls, error } = await supabase
+      .from("calls")
+      .select("retell_call_id, from_number, to_number, status, duration_seconds, summary, transcript, created_at")
+      .eq("tenant_id", tenantId)
+      .order("created_at", { ascending: false })
+      .limit(5);
+
+    if (error) {
+      callStatus.textContent = `Не успяхме да заредим разговорите: ${error.message}`;
+      return;
+    }
+
+    if (!calls?.length) {
+      callStatus.textContent = "Още няма записани Retell разговори.";
+      renderEmptyState(callList, "След webhook теста тук ще се появи последният call.");
+      return;
+    }
+
+    callStatus.textContent = `Последни ${calls.length} разговора`;
+    callList.innerHTML = calls.map((call) => {
+      const excerpt = call.summary || call.transcript || "Няма summary/transcript още.";
+      return `
+        <article class="call-item">
+          <div class="call-item-top">
+            <strong>${escapeHtml(call.from_number || "непознат номер")}</strong>
+            <span>${escapeHtml(call.status)}</span>
+          </div>
+          <p>${escapeHtml(excerpt.slice(0, 220))}</p>
+          <small>${formatDateTime(call.created_at)} · ${call.duration_seconds || 0}s · ${escapeHtml(call.retell_call_id || "")}</small>
+        </article>
+      `;
+    }).join("");
+  };
+
+  const loadLeads = async (tenantId: string) => {
+    if (!supabase || !leadStatus || !leadList) return;
+
+    const { data: leads, error } = await supabase
+      .from("leads")
+      .select("name, phone, intent, notes, status, created_at")
+      .eq("tenant_id", tenantId)
+      .order("created_at", { ascending: false })
+      .limit(5);
+
+    if (error) {
+      leadStatus.textContent = `Не успяхме да заредим lead-овете: ${error.message}`;
+      return;
+    }
+
+    if (!leads?.length) {
+      leadStatus.textContent = "Още няма извлечени заявки.";
+      renderEmptyState(leadList, "След analyzed call тук ще има име, телефон и услуга.");
+      return;
+    }
+
+    leadStatus.textContent = `Последни ${leads.length} заявки`;
+    leadList.innerHTML = leads.map((lead) => `
+      <article class="lead-item">
+        <div class="call-item-top">
+          <strong>${escapeHtml(lead.name || "Без име")}</strong>
+          <span>${escapeHtml(lead.status)}</span>
+        </div>
+        <p>${escapeHtml(lead.intent || lead.notes || "Няма описана услуга още.")}</p>
+        <small>${escapeHtml(lead.phone || "няма телефон")} · ${formatDateTime(lead.created_at)}</small>
+      </article>
+    `).join("");
+  };
+
+  const renderCalendarConnection = (connections: any[], resources: any[]) => {
+    if (!calendarConnection || !calendarStatus) return;
+
+    if (!connections.length) {
+      calendarStatus.textContent = "Календарът още не е свързан.";
+      calendarProviders?.removeAttribute("hidden");
+      calendarConnection.setAttribute("hidden", "");
+      return;
+    }
+
+    calendarProviders?.setAttribute("hidden", "");
+    calendarConnection.removeAttribute("hidden");
+
+    const connectedCount = connections.length;
+
+    calendarStatus.textContent = `${connectedCount} Google ${connectedCount === 1 ? "календар" : "календара"} · ${resources.length} ${resources.length === 1 ? "ресурс" : "ресурса"}`;
+    calendarConnection.innerHTML = `
+      <div class="calendar-state">
+        <div>
+          <strong>Google Calendar resources</strong>
+          <span>connected</span>
+        </div>
+        <p>Всеки добавен календар може да се именува като човек, стая или ресурс. Booking-ът използва това име при избора на слот.</p>
+      </div>
+      <div class="calendar-actions">
+        <button type="button" data-add-google-calendar>Добави Google календар</button>
+      </div>
+      <div class="calendar-account-list">
+        ${connections.map((connection) => `
+          <div class="calendar-account">
+            <strong>${escapeHtml(connection.connected_email || "Google account")}</strong>
+            <small>${escapeHtml(connection.selected_calendar_name || connection.selected_calendar_id || "няма избран календар")}</small>
+          </div>
+        `).join("")}
+      </div>
+      <div class="calendar-resource-list">
+        <strong>Лекари / ресурси</strong>
+        ${
+          resources.length
+            ? resources.map((resource) => `
+                <form class="calendar-resource" data-resource-form data-resource-id="${escapeHtml(resource.id)}">
+                  <label>
+                    Име за разпознаване
+                    <input name="name" value="${escapeHtml(resource.name || "")}" placeholder="Напр. д-р Иванова" />
+                  </label>
+                  <small>${escapeHtml(resource.provider_calendar_name || resource.provider_calendar_id || "Google calendar")} · ${escapeHtml(resource.provider_account_email || "")}</small>
+                  <button type="submit">Запази име</button>
+                </form>
+              `).join("")
+            : '<p class="empty-state">Още няма добавени лекари/календари.</p>'
+        }
+      </div>
+    `;
+
+    calendarConnection
+      .querySelector<HTMLButtonElement>("[data-add-google-calendar]")
+      ?.addEventListener("click", () => startGoogleCalendarAuth("multi_google"));
+    calendarConnection
+      .querySelectorAll<HTMLFormElement>("[data-resource-form]")
+      .forEach((form) => {
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          if (!supabase || !activeTenantId) return;
+          const resourceId = form.dataset.resourceId;
+          const formData = new FormData(form);
+          const name = String(formData.get("name") || "").trim();
+          if (!resourceId || !name) {
+            setCalendarMessage("Въведи име на ресурса, например д-р Иванова.");
+            return;
+          }
+          const { error } = await supabase
+            .from("calendar_resources")
+            .update({ name })
+            .eq("id", resourceId)
+            .eq("tenant_id", activeTenantId);
+          if (error) {
+            setCalendarMessage(error.message);
+            return;
+          }
+          setCalendarMessage("Името на ресурса е запазено.");
+          await loadCalendarSetup(activeTenantId);
+        });
+      });
+  };
+
+  const loadCalendarSetup = async (tenantId: string) => {
+    if (!supabase || !calendarStatus) return;
+
+    const { data: connections, error: connectionError } = await supabase
+      .from("calendar_connections")
+      .select("id, provider, mode, connected_email, status, selected_calendar_id, selected_calendar_name, metadata, updated_at")
+      .eq("tenant_id", tenantId)
+      .eq("provider", "google_calendar")
+      .eq("status", "connected")
+      .order("updated_at", { ascending: false });
+
+    if (connectionError) {
+      calendarStatus.textContent = `Не успяхме да заредим calendar връзката: ${connectionError.message}`;
+      return;
+    }
+
+    const { data: resources } = connections?.length
+      ? await supabase
+          .from("calendar_resources")
+          .select("id, calendar_connection_id, name, provider_calendar_id, provider_calendar_name, provider_account_email, active")
+          .eq("tenant_id", tenantId)
+          .eq("active", true)
+          .order("created_at", { ascending: true })
+      : { data: [] };
+
+    renderCalendarConnection(connections || [], resources || []);
+  };
+
+  const initApp = async () => {
+    if (!supabase || !isSupabaseConfigured) {
+      setStatus("Supabase още не е конфигуриран.");
+      return;
+    }
+
+    const { data } = await supabase.auth.getSession();
+
+    if (!data.session) {
+      window.location.assign("/login");
+      return;
+    }
+
+    const { data: memberships, error } = await supabase
+      .from("tenant_members")
+      .select("tenant_id, role")
+      .limit(1);
+
+    if (error) {
+      setStatus(`Не успяхме да заредим бизнес профила: ${error.message}`);
+      return;
+    }
+
+    const membership = memberships?.[0];
+
+    if (!membership) {
+      setStatus("Профилът е активен. Попълнете данните за бизнеса, за да създадем tenant.");
+      onboardingForm?.removeAttribute("hidden");
+    } else {
+      activeTenantId = membership.tenant_id;
+      const { data: subscriptions } = await supabase
+        .from("subscriptions")
+        .select("plan_key, status")
+        .eq("tenant_id", membership.tenant_id)
+        .limit(1);
+
+      const subscription = subscriptions?.[0];
+      if (subscription && planStatus) {
+        planStatus.textContent = `Избран план: ${subscription.plan_key}. Статус: ${subscription.status}.`;
+        if (subscription.status === "active") {
+          planButtons.forEach((button) => {
+            button.disabled = true;
+          });
+        }
+      }
+
+      const { data: jobs } = await supabase
+        .from("provisioning_jobs")
+        .select("status, step, updated_at")
+        .eq("tenant_id", membership.tenant_id)
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      const latestJob = jobs?.[0];
+      if (latestJob && provisioningStatus) {
+        provisioningStatus.textContent = `Стъпка: ${latestJob.step}. Статус: ${latestJob.status}.`;
+      }
+
+      await Promise.all([
+        loadPhoneNumbers(membership.tenant_id),
+        loadCalls(membership.tenant_id),
+        loadLeads(membership.tenant_id),
+        loadCalendarSetup(membership.tenant_id),
+      ]);
+
+      setStatus("Бизнес профилът е създаден. Следва subscription и provisioning flow.");
+      content?.removeAttribute("hidden");
+    }
+
+    logout?.removeAttribute("hidden");
+  };
+
+  initApp();
+
+  onboardingForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!supabase || !onboardingMessage) return;
+
+    const formData = new FormData(onboardingForm);
+    onboardingMessage.textContent = "Създаваме бизнес профила...";
+
+    const { error } = await supabase.rpc("create_tenant_onboarding", {
+      business_name: String(formData.get("business_name") || ""),
+      niche: String(formData.get("niche") || ""),
+      city: String(formData.get("city") || ""),
+      main_phone: String(formData.get("main_phone") || ""),
+      contact_email: String(formData.get("contact_email") || ""),
+      wants_booking: formData.get("wants_booking") === "on",
+    });
+
+    if (error) {
+      onboardingMessage.textContent = error.message;
+      return;
+    }
+
+    onboardingMessage.textContent = "Бизнес профилът е създаден.";
+    window.location.reload();
+  });
+
+  planButtons.forEach((button) => {
+    button.addEventListener("click", async () => {
+      if (!supabase || !planStatus) return;
+
+      const planKey = button.dataset.planKey;
+      if (!planKey) return;
+
+      planStatus.textContent = "Записваме избрания план...";
+      const { error } = await supabase.rpc("select_subscription_plan", {
+        plan_key: planKey,
+      });
+
+      if (error) {
+        planStatus.textContent = error.message;
+        return;
+      }
+
+      planStatus.textContent = `Избран план: ${planKey}. Статус: pending_payment.`;
+    });
+  });
+
+  calendarProviderButtons.forEach((button) => {
+    button.addEventListener("click", async () => {
+      if (!supabase || !activeTenantId) return;
+
+      const provider = button.dataset.calendarProvider;
+      if (!provider) return;
+
+      setCalendarMessage("");
+
+      if (provider === "google_calendar") {
+        await startGoogleCalendarAuth("solo_google");
+        return;
+      }
+    });
+  });
+
+  logout?.addEventListener("click", async () => {
+    if (!supabase) return;
+    await supabase.auth.signOut();
+    window.location.assign("/login");
+  });
+</script>
+
+<style>
+  .app-section {
+    min-height: calc(100vh - 72px);
+  }
+
+  .app-wrap {
+    display: grid;
+    gap: 24px;
+  }
+
+  .app-heading h1 {
+    margin-bottom: 12px;
+  }
+
+  .app-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .plan-panel {
+    display: grid;
+    grid-column: 1 / -1;
+    gap: 18px;
+    padding: 22px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--white);
+  }
+
+  .plan-panel h2 {
+    margin-bottom: 10px;
+    font-size: 1.35rem;
+  }
+
+  .plan-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .plan-option {
+    display: grid;
+    min-height: 112px;
+    gap: 8px;
+    align-content: start;
+    padding: 16px;
+    border: 1px solid #bdc8d4;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .plan-option:hover {
+    border-color: var(--green);
+  }
+
+  .plan-option:disabled {
+    cursor: not-allowed;
+    opacity: 0.58;
+  }
+
+  .plan-option span {
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+
+  .onboarding-panel {
+    display: grid;
+    max-width: 620px;
+    gap: 16px;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--white);
+    box-shadow: var(--shadow);
+  }
+
+  label {
+    display: grid;
+    gap: 7px;
+    color: #2a323b;
+    font-weight: 700;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    min-height: 46px;
+    padding: 10px 12px;
+    border: 1px solid #bdc8d4;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--ink);
+  }
+
+  textarea {
+    resize: vertical;
+    line-height: 1.45;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .checkbox-label input {
+    width: 18px;
+    min-height: 18px;
+  }
+
+  .app-message {
+    margin: 0;
+    font-size: 0.94rem;
+  }
+
+  .app-panel {
+    min-height: 190px;
+    padding: 22px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--white);
+  }
+
+  .app-panel h2 {
+    margin-bottom: 10px;
+    font-size: 1.35rem;
+  }
+
+  .call-history-panel,
+  .lead-panel,
+  .calendar-panel {
+    display: grid;
+    align-content: start;
+    gap: 12px;
+  }
+
+	  .call-list,
+	  .lead-list,
+	  .calendar-provider-grid,
+	  .calendar-connection,
+	  .calendar-account-list,
+	  .calendar-resource-list {
+	    display: grid;
+	    gap: 10px;
+	  }
+
+	  .calendar-provider-grid {
+	    grid-template-columns: minmax(0, 1fr);
+	  }
+
+	  .calendar-provider-grid button,
+	  .calendar-actions button,
+	  .calendar-resource button {
+	    min-height: 48px;
+	    padding: 12px;
+    border: 1px solid #bdc8d4;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+    font-weight: 740;
+  }
+
+  .calendar-provider-grid button {
+    display: grid;
+    min-height: 96px;
+    gap: 7px;
+    align-content: start;
+  }
+
+	  .calendar-provider-grid button:hover,
+	  .calendar-actions button:hover,
+	  .calendar-resource button:hover {
+	    border-color: var(--green);
+	  }
+
+	  .calendar-provider-grid span,
+	  .calendar-state p,
+	  .calendar-account small,
+	  .calendar-resource small {
+	    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.42;
+  }
+
+	  .calendar-state,
+	  .calendar-account,
+	  .calendar-resource {
+	    display: grid;
+	    gap: 7px;
+    padding: 12px;
+    border: 1px solid #d8e0e8;
+    border-radius: 6px;
+    background: #f8faf9;
+  }
+
+  .calendar-state div {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .calendar-state span {
+    flex: 0 0 auto;
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: #e8f3ee;
+    color: var(--green);
+    font-size: 0.72rem;
+    font-weight: 760;
+    text-transform: uppercase;
+  }
+
+	  .calendar-actions {
+	    display: flex;
+	    flex-wrap: wrap;
+	    gap: 10px;
+	  }
+
+	  .calendar-resource {
+	    grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto;
+	    align-items: end;
+	  }
+
+	  .calendar-resource small {
+	    align-self: center;
+	    overflow-wrap: anywhere;
+	  }
+
+  .call-item,
+  .lead-item {
+    display: grid;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid #d8e0e8;
+    border-radius: 6px;
+    background: #f8faf9;
+  }
+
+  .call-item p,
+  .lead-item p,
+  .empty-state {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.94rem;
+    line-height: 1.45;
+  }
+
+  .call-item small,
+  .lead-item small {
+    color: #607080;
+    font-size: 0.78rem;
+  }
+
+  .call-item-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .call-item-top span {
+    flex: 0 0 auto;
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: #e8f3ee;
+    color: var(--green);
+    font-size: 0.72rem;
+    font-weight: 760;
+    text-transform: uppercase;
+  }
+
+  .panel-label {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--green);
+    font-size: 0.78rem;
+    font-weight: 760;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 760px) {
+    .app-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .plan-list {
+      grid-template-columns: 1fr;
+    }
+
+	    .calendar-provider-grid {
+	      grid-template-columns: 1fr;
+	    }
+
+	    .calendar-resource {
+	      grid-template-columns: 1fr;
+	    }
+	  }
+</style>
