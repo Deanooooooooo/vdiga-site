@@ -11,7 +11,10 @@ import { site } from "../data/site";
     <nav class="nav-links" aria-label="Основна навигация">
       {site.nav.map((item) => <a href={item.href}>{item.label}</a>)}
     </nav>
-    <a class="btn btn-secondary" href="/demo">Чуйте демото</a>
+    <div class="nav-actions">
+      <a class="btn btn-secondary btn-small" href="/login">Вход</a>
+      <a class="btn btn-primary btn-small" href="/signup">Регистрация</a>
+      <a class="btn btn-secondary btn-small nav-demo" href="/demo">Демо</a>
+    </div>
   </div>
 </header>
-

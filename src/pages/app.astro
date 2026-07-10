@@ -131,6 +131,63 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
           <p class="app-message" data-calendar-message></p>
         </article>
+
+        <article class="app-panel business-profile-panel" data-business-profile-panel>
+          <div class="panel-title-row">
+            <div>
+              <span class="panel-label">Настройки</span>
+              <h2>Бизнес профил</h2>
+            </div>
+            <button class="btn btn-secondary btn-small" type="button" data-business-edit-toggle>Редактирай</button>
+          </div>
+
+          <div class="business-summary" data-business-summary>
+            <p>Зареждаме въведените данни...</p>
+          </div>
+
+          <form class="business-edit-form" hidden data-business-edit-form>
+            <label>
+              Име на бизнес
+              <input required name="business_name" autocomplete="organization" />
+            </label>
+
+            <label>
+              Ниша
+              <select name="niche">
+                <option value="">Изберете ниша</option>
+                <option value="dental">Зъболекар / дентална клиника</option>
+                <option value="clinic">Клиника / медицински услуги</option>
+                <option value="beauty">Салон / beauty</option>
+                <option value="auto_service">Автосервиз</option>
+                <option value="real_estate">Имоти</option>
+                <option value="hotel">Хотел / туризъм</option>
+                <option value="general_services">Услуги</option>
+              </select>
+            </label>
+
+            <label>
+              Град
+              <input name="city" autocomplete="address-level2" />
+            </label>
+
+            <label>
+              Бизнес телефон
+              <input name="main_phone" autocomplete="tel" />
+            </label>
+
+            <label>
+              Контактен email
+              <input name="contact_email" type="email" autocomplete="email" />
+            </label>
+
+            <div class="form-actions">
+              <button class="btn btn-primary btn-small" type="submit">Запази</button>
+              <button class="btn btn-secondary btn-small" type="button" data-business-edit-cancel>Откажи</button>
+            </div>
+          </form>
+
+          <p class="app-message" data-business-message></p>
+        </article>
       </div>
 
       <button class="btn btn-secondary" type="button" hidden data-logout>Изход</button>
@@ -159,7 +216,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   const calendarProviderButtons = document.querySelectorAll<HTMLButtonElement>("[data-calendar-provider]");
   const calendarConnection = document.querySelector<HTMLElement>("[data-calendar-connection]");
   const calendarMessage = document.querySelector<HTMLElement>("[data-calendar-message]");
+  const businessSummary = document.querySelector<HTMLElement>("[data-business-summary]");
+  const businessEditToggle = document.querySelector<HTMLButtonElement>("[data-business-edit-toggle]");
+  const businessEditCancel = document.querySelector<HTMLButtonElement>("[data-business-edit-cancel]");
+  const businessEditForm = document.querySelector<HTMLFormElement>("[data-business-edit-form]");
+  const businessMessage = document.querySelector<HTMLElement>("[data-business-message]");
   let activeTenantId: string | null = null;
+  let activeBusinessProfile: any = null;
 
   const setStatus = (value: string) => {
     if (status) status.textContent = value;
@@ -186,6 +249,100 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
   const setCalendarMessage = (value: string) => {
     if (calendarMessage) calendarMessage.textContent = value;
+  };
+
+  const nicheLabels: Record<string, string> = {
+    dental: "Зъболекар / дентална клиника",
+    clinic: "Клиника / медицински услуги",
+    beauty: "Салон / beauty",
+    auto_service: "Автосервиз",
+    real_estate: "Имоти",
+    hotel: "Хотел / туризъм",
+    general_services: "Услуги",
+  };
+
+  const cleanValue = (value?: string | null) => value?.trim() || "";
+
+  const getStatusLabel = (value?: string | null) => {
+    const labels: Record<string, string> = {
+      active: "Активен",
+      connected: "Свързан",
+      succeeded: "Готов",
+      running: "Настройва се",
+      queued: "На опашка",
+      waiting_for_customer: "Нужна настройка",
+      failed: "Проблем",
+      pending_payment: "Очаква плащане",
+      incomplete: "Незавършен",
+    };
+
+    if (!value) return "Не е настроено";
+    return labels[value] || value;
+  };
+
+  const renderBusinessProfile = (profile: any) => {
+    activeBusinessProfile = profile;
+
+    if (!businessSummary || !businessEditForm) return;
+
+    if (!profile) {
+      businessSummary.innerHTML = '<p class="empty-state">Няма намерени бизнес данни към този профил.</p>';
+      businessEditForm.setAttribute("hidden", "");
+      return;
+    }
+
+    const details = [
+      ["Бизнес", cleanValue(profile.business_name)],
+      ["Ниша", nicheLabels[cleanValue(profile.niche)] || cleanValue(profile.niche)],
+      ["Град", cleanValue(profile.city)],
+      ["Телефон", cleanValue(profile.main_phone)],
+      ["Email", cleanValue(profile.contact_email)],
+    ];
+
+    businessSummary.innerHTML = details
+      .map(([label, value]) => `
+        <div class="business-summary-item ${value ? "" : "is-missing"}">
+          <span>${escapeHtml(label)}</span>
+          <strong>${escapeHtml(value || "Липсва")}</strong>
+        </div>
+      `)
+      .join("");
+
+    const form = businessEditForm;
+    (form.elements.namedItem("business_name") as HTMLInputElement).value = cleanValue(profile.business_name);
+    (form.elements.namedItem("niche") as HTMLSelectElement).value = cleanValue(profile.niche);
+    (form.elements.namedItem("city") as HTMLInputElement).value = cleanValue(profile.city);
+    (form.elements.namedItem("main_phone") as HTMLInputElement).value = cleanValue(profile.main_phone);
+    (form.elements.namedItem("contact_email") as HTMLInputElement).value = cleanValue(profile.contact_email);
+  };
+
+  const setBusinessEditing = (isEditing: boolean) => {
+    if (!businessEditForm || !businessEditToggle || !businessSummary) return;
+
+    businessEditForm.toggleAttribute("hidden", !isEditing);
+    businessSummary.toggleAttribute("hidden", isEditing);
+    businessEditToggle.textContent = isEditing ? "Затвори" : "Редактирай";
+
+    if (isEditing && activeBusinessProfile) {
+      renderBusinessProfile(activeBusinessProfile);
+    }
+  };
+
+  const loadBusinessProfile = async (tenantId: string) => {
+    if (!supabase) return;
+
+    const { data: profiles, error } = await supabase
+      .from("business_profiles")
+      .select("business_name, niche, city, main_phone, contact_email")
+      .eq("tenant_id", tenantId)
+      .limit(1);
+
+    if (error) {
+      if (businessSummary) businessSummary.innerHTML = `<p class="empty-state">Не успяхме да заредим бизнес профила: ${escapeHtml(error.message)}</p>`;
+      return;
+    }
+
+    renderBusinessProfile(profiles?.[0] || null);
   };
 
   const startGoogleCalendarAuth = async (mode = "solo_google") => {
@@ -234,7 +391,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       return;
     }
 
-    phoneStatus.textContent = `DID: ${number.didww_number || number.retell_phone_number || "няма"} · статус: ${number.status}`;
+    phoneStatus.textContent = `Номер: ${number.didww_number || number.retell_phone_number || "няма"} · ${getStatusLabel(number.status)}`;
   };
 
   const loadCalls = async (tenantId: string) => {
@@ -327,10 +484,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     calendarConnection.innerHTML = `
       <div class="calendar-state">
         <div>
-          <strong>Google Calendar resources</strong>
-          <span>connected</span>
+          <strong>Google Calendar</strong>
+          <span>Свързан</span>
         </div>
-        <p>Всеки добавен календар може да се именува като човек, стая или ресурс. Booking-ът използва това име при избора на слот.</p>
+        <p>Всеки календар може да носи име на човек, кабинет или ресурс, за да се избира правилният слот при записване.</p>
       </div>
       <div class="calendar-actions">
         <button type="button" data-add-google-calendar>Добави Google календар</button>
@@ -344,17 +501,17 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         `).join("")}
       </div>
       <div class="calendar-resource-list">
-        <strong>Лекари / ресурси</strong>
+        <strong>Хора и ресурси</strong>
         ${
           resources.length
             ? resources.map((resource) => `
                 <form class="calendar-resource" data-resource-form data-resource-id="${escapeHtml(resource.id)}">
                   <label>
-                    Име за разпознаване
+                    Име
                     <input name="name" value="${escapeHtml(resource.name || "")}" placeholder="Напр. д-р Иванова" />
                   </label>
                   <small>${escapeHtml(resource.provider_calendar_name || resource.provider_calendar_id || "Google calendar")} · ${escapeHtml(resource.provider_account_email || "")}</small>
-                  <button type="submit">Запази име</button>
+                  <button type="submit">Запази</button>
                 </form>
               `).join("")
             : '<p class="empty-state">Още няма добавени лекари/календари.</p>'
@@ -459,7 +616,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
       const subscription = subscriptions?.[0];
       if (subscription && planStatus) {
-        planStatus.textContent = `Избран план: ${subscription.plan_key}. Статус: ${subscription.status}.`;
+        planStatus.textContent = `План: ${subscription.plan_key} · ${getStatusLabel(subscription.status)}`;
         if (subscription.status === "active") {
           planButtons.forEach((button) => {
             button.disabled = true;
@@ -476,17 +633,18 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
       const latestJob = jobs?.[0];
       if (latestJob && provisioningStatus) {
-        provisioningStatus.textContent = `Стъпка: ${latestJob.step}. Статус: ${latestJob.status}.`;
+        provisioningStatus.textContent = `${getStatusLabel(latestJob.status)} · обновено ${formatDateTime(latestJob.updated_at)}`;
       }
 
       await Promise.all([
+        loadBusinessProfile(membership.tenant_id),
         loadPhoneNumbers(membership.tenant_id),
         loadCalls(membership.tenant_id),
         loadLeads(membership.tenant_id),
         loadCalendarSetup(membership.tenant_id),
       ]);
 
-      setStatus("Бизнес профилът е създаден. Следва subscription и provisioning flow.");
+      setStatus("Профилът е активен.");
       content?.removeAttribute("hidden");
     }
 
@@ -538,8 +696,61 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         return;
       }
 
-      planStatus.textContent = `Избран план: ${planKey}. Статус: pending_payment.`;
+      planStatus.textContent = `План: ${planKey} · Очаква плащане`;
     });
+  });
+
+  businessEditToggle?.addEventListener("click", () => {
+    const isEditing = businessEditForm?.hasAttribute("hidden") ?? false;
+    setBusinessEditing(isEditing);
+    if (businessMessage) businessMessage.textContent = "";
+  });
+
+  businessEditCancel?.addEventListener("click", () => {
+    setBusinessEditing(false);
+    if (businessMessage) businessMessage.textContent = "";
+  });
+
+  businessEditForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!supabase || !activeTenantId || !businessMessage) return;
+
+    const formData = new FormData(businessEditForm);
+    const businessName = String(formData.get("business_name") || "").trim();
+
+    if (!businessName) {
+      businessMessage.textContent = "Името на бизнеса е задължително.";
+      return;
+    }
+
+    businessMessage.textContent = "Запазваме промените...";
+
+    const values = {
+      business_name: businessName,
+      niche: String(formData.get("niche") || "").trim() || null,
+      city: String(formData.get("city") || "").trim() || null,
+      main_phone: String(formData.get("main_phone") || "").trim() || null,
+      contact_email: String(formData.get("contact_email") || "").trim() || null,
+    };
+
+    const { error } = await supabase
+      .from("business_profiles")
+      .update(values)
+      .eq("tenant_id", activeTenantId);
+
+    if (error) {
+      businessMessage.textContent = error.message;
+      return;
+    }
+
+    await supabase
+      .from("tenants")
+      .update({ name: businessName })
+      .eq("id", activeTenantId);
+
+    businessMessage.textContent = "Бизнес профилът е обновен.";
+    await loadBusinessProfile(activeTenantId);
+    setBusinessEditing(false);
   });
 
   calendarProviderButtons.forEach((button) => {
@@ -699,33 +910,98 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     font-size: 1.35rem;
   }
 
+  .panel-title-row {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .panel-title-row h2 {
+    margin-bottom: 0;
+  }
+
   .call-history-panel,
   .lead-panel,
-  .calendar-panel {
+  .calendar-panel,
+  .business-profile-panel {
     display: grid;
     align-content: start;
     gap: 12px;
   }
 
-	  .call-list,
-	  .lead-list,
-	  .calendar-provider-grid,
-	  .calendar-connection,
-	  .calendar-account-list,
-	  .calendar-resource-list {
-	    display: grid;
-	    gap: 10px;
-	  }
+  .business-profile-panel,
+  .calendar-panel {
+    grid-column: 1 / -1;
+  }
 
-	  .calendar-provider-grid {
-	    grid-template-columns: minmax(0, 1fr);
-	  }
+  .business-summary {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+  }
 
-	  .calendar-provider-grid button,
-	  .calendar-actions button,
-	  .calendar-resource button {
-	    min-height: 48px;
-	    padding: 12px;
+  .business-summary-item {
+    display: grid;
+    gap: 4px;
+    min-height: 76px;
+    align-content: start;
+    padding: 12px;
+    border: 1px solid #d8e0e8;
+    border-radius: 6px;
+    background: #f8faf9;
+  }
+
+  .business-summary-item span {
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 740;
+  }
+
+  .business-summary-item strong {
+    overflow-wrap: anywhere;
+    color: var(--ink);
+    font-size: 0.98rem;
+    line-height: 1.35;
+  }
+
+  .business-summary-item.is-missing strong {
+    color: #b4523c;
+  }
+
+  .business-edit-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    padding-top: 4px;
+  }
+
+  .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .call-list,
+  .lead-list,
+  .calendar-provider-grid,
+  .calendar-connection,
+  .calendar-account-list,
+  .calendar-resource-list {
+    display: grid;
+    gap: 10px;
+  }
+
+  .calendar-provider-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .calendar-provider-grid button,
+  .calendar-actions button,
+  .calendar-resource button {
+    min-height: 48px;
+    padding: 12px;
     border: 1px solid #bdc8d4;
     border-radius: 6px;
     background: #fff;
@@ -742,30 +1018,41 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     align-content: start;
   }
 
-	  .calendar-provider-grid button:hover,
-	  .calendar-actions button:hover,
-	  .calendar-resource button:hover {
-	    border-color: var(--green);
-	  }
+  .calendar-provider-grid button:hover,
+  .calendar-actions button:hover,
+  .calendar-resource button:hover {
+    border-color: var(--green);
+  }
 
-	  .calendar-provider-grid span,
-	  .calendar-state p,
-	  .calendar-account small,
-	  .calendar-resource small {
-	    color: var(--muted);
+  .calendar-provider-grid span,
+  .calendar-state p,
+  .calendar-account small,
+  .calendar-resource small {
+    color: var(--muted);
     font-size: 0.9rem;
     line-height: 1.42;
   }
 
-	  .calendar-state,
-	  .calendar-account,
-	  .calendar-resource {
-	    display: grid;
-	    gap: 7px;
+  .calendar-state,
+  .calendar-account,
+  .calendar-resource {
+    display: grid;
+    gap: 7px;
     padding: 12px;
     border: 1px solid #d8e0e8;
     border-radius: 6px;
     background: #f8faf9;
+  }
+
+  .calendar-state {
+    padding: 14px;
+    border-color: rgba(13, 107, 87, 0.22);
+    background: #f1f8f4;
+  }
+
+  .calendar-account-list,
+  .calendar-resource-list {
+    padding-top: 2px;
   }
 
   .calendar-state div {
@@ -785,21 +1072,21 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     text-transform: uppercase;
   }
 
-	  .calendar-actions {
-	    display: flex;
-	    flex-wrap: wrap;
-	    gap: 10px;
-	  }
+  .calendar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
 
-	  .calendar-resource {
-	    grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto;
-	    align-items: end;
-	  }
+  .calendar-resource {
+    grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto;
+    align-items: end;
+  }
 
-	  .calendar-resource small {
-	    align-self: center;
-	    overflow-wrap: anywhere;
-	  }
+  .calendar-resource small {
+    align-self: center;
+    overflow-wrap: anywhere;
+  }
 
   .call-item,
   .lead-item {
@@ -862,12 +1149,25 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       grid-template-columns: 1fr;
     }
 
-	    .calendar-provider-grid {
-	      grid-template-columns: 1fr;
-	    }
+    .business-summary,
+    .business-edit-form {
+      grid-template-columns: 1fr;
+    }
 
-	    .calendar-resource {
-	      grid-template-columns: 1fr;
-	    }
-	  }
+    .panel-title-row {
+      align-items: stretch;
+    }
+
+    .panel-title-row .btn {
+      flex: 0 0 auto;
+    }
+
+    .calendar-provider-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .calendar-resource {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>

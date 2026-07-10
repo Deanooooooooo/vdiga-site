@@ -201,6 +201,12 @@ p {
   color: #626c78;
 }
 
+.btn-small {
+  min-height: 40px;
+  padding: 10px 13px;
+  font-size: 0.92rem;
+}
+
 .header {
   position: sticky;
   z-index: 20;
@@ -254,6 +260,13 @@ p {
 .nav-links a:hover {
   background: rgba(17, 20, 25, 0.06);
   color: var(--ink);
+}
+
+.nav-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
 }
 
 .hero {
@@ -654,6 +667,10 @@ tr:last-child td {
     display: none;
   }
 
+  .nav-demo {
+    display: none;
+  }
+
   .footer-links {
     justify-content: flex-start;
   }
@@ -683,6 +700,20 @@ tr:last-child td {
 
   .button-row .btn {
     width: 100%;
+  }
+
+  .nav {
+    gap: 10px;
+  }
+
+  .nav-actions {
+    gap: 6px;
+  }
+
+  .nav-actions .btn {
+    min-height: 38px;
+    padding: 9px 10px;
+    font-size: 0.86rem;
   }
 
   .timeline-row {
