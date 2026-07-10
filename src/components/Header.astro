@@ -1,10 +1,10 @@
 ---
-import { site } from "../data/site";
+import { site, withBase } from "../data/site";
 ---
 
 <header class="header">
   <div class="container nav">
-    <a class="brand" href="/" aria-label="Vdiga начало">
+    <a class="brand" href={withBase("/")} aria-label="Vdiga начало">
       <span class="brand-mark">V</span>
       <span>Vdiga</span>
     </a>
@@ -12,9 +12,9 @@ import { site } from "../data/site";
       {site.nav.map((item) => <a href={item.href}>{item.label}</a>)}
     </nav>
     <div class="nav-actions">
-      <a class="btn btn-secondary btn-small" href="/login">Вход</a>
-      <a class="btn btn-primary btn-small" href="/signup">Регистрация</a>
-      <a class="btn btn-secondary btn-small nav-demo" href="/demo">Демо</a>
+      <a class="btn btn-secondary btn-small" href={withBase("/login")}>Вход</a>
+      <a class="btn btn-primary btn-small" href={withBase("/signup")}>Регистрация</a>
+      <a class="btn btn-secondary btn-small nav-demo" href={withBase("/demo")}>Демо</a>
     </div>
   </div>
 </header>

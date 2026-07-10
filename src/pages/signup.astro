@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { withBase } from "../data/site";
 ---
 
 <BaseLayout
@@ -29,7 +30,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         </label>
         <button class="btn btn-primary" type="submit">Създай профил</button>
         <p class="auth-message" data-auth-message></p>
-        <p class="auth-alt">Вече имате профил? <a href="/login">Вход</a></p>
+        <p class="auth-alt">Вече имате профил? <a href={withBase("/login")}>Вход</a></p>
       </form>
     </div>
   </section>
@@ -40,6 +41,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
   const form = document.querySelector<HTMLFormElement>('[data-auth-form="signup"]');
   const message = document.querySelector<HTMLElement>("[data-auth-message]");
+  const appPath = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/app`;
 
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -59,7 +61,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/app`,
+        emailRedirectTo: `${window.location.origin}${appPath}`,
       },
     });
 
@@ -130,4 +132,3 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     }
   }
 </style>
-

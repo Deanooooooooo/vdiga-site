@@ -221,6 +221,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   const businessEditCancel = document.querySelector<HTMLButtonElement>("[data-business-edit-cancel]");
   const businessEditForm = document.querySelector<HTMLFormElement>("[data-business-edit-form]");
   const businessMessage = document.querySelector<HTMLElement>("[data-business-message]");
+  const loginPath = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/login`;
   let activeTenantId: string | null = null;
   let activeBusinessProfile: any = null;
 
@@ -587,7 +588,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     const { data } = await supabase.auth.getSession();
 
     if (!data.session) {
-      window.location.assign("/login");
+      window.location.assign(loginPath);
       return;
     }
 
@@ -772,7 +773,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   logout?.addEventListener("click", async () => {
     if (!supabase) return;
     await supabase.auth.signOut();
-    window.location.assign("/login");
+    window.location.assign(loginPath);
   });
 </script>
 

@@ -1,11 +1,11 @@
 ---
-import { site } from "../data/site";
+import { site, withBase } from "../data/site";
 ---
 
 <footer class="footer">
   <div class="container footer-grid">
     <div>
-      <a class="brand" href="/">
+      <a class="brand" href={withBase("/")}>
         <span class="brand-mark">V</span>
         <span>Vdiga</span>
       </a>
@@ -19,4 +19,3 @@ import { site } from "../data/site";
     </div>
   </div>
 </footer>
-

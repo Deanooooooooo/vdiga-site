@@ -1,3 +1,11 @@
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+export const withBase = (path: string) => {
+  if (/^(https?:|mailto:|tel:)/.test(path)) return path;
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  return `${basePath}${normalizedPath}` || "/";
+};
+
 export const site = {
   brand: "Vdiga",
   domain: "vdiga.bg",
@@ -37,11 +45,11 @@ export const site = {
     },
   ],
   nav: [
-    { href: "/", label: "Начало" },
-    { href: "/tseni", label: "Цени" },
-    { href: "/demo", label: "Демо" },
-    { href: "/kak-raboti", label: "Как работи" },
-    { href: "/za-nas", label: "За нас" },
+    { href: withBase("/"), label: "Начало" },
+    { href: withBase("/tseni"), label: "Цени" },
+    { href: withBase("/demo"), label: "Демо" },
+    { href: withBase("/kak-raboti"), label: "Как работи" },
+    { href: withBase("/za-nas"), label: "За нас" },
   ],
 };
 
@@ -51,4 +59,3 @@ export const coreQuestions = [
   "Как работи AI телефонен асистент?",
   "Кой стои зад Vdiga?",
 ];
-

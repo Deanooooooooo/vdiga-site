@@ -5,6 +5,7 @@ import PricingCards from "../components/PricingCards.astro";
 import FAQ from "../components/FAQ.astro";
 import CTA from "../components/CTA.astro";
 import { articleSchema, faqSchema, productSchema } from "../data/schema";
+import { withBase } from "../data/site";
 
 const faqs = [
   {
@@ -48,8 +49,8 @@ const faqs = [
           Клиентът не чака удобен момент. Той звъни, пита и решава. Vdiga отговаря, когато екипът ви работи, почива или е с друг клиент.
         </p>
         <div class="button-row">
-          <a class="btn btn-primary" href="/demo">Чуйте демото</a>
-          <a class="btn btn-secondary" href="/tseni">Вижте цените</a>
+          <a class="btn btn-primary" href={withBase("/demo")}>Чуйте демото</a>
+          <a class="btn btn-secondary" href={withBase("/tseni")}>Вижте цените</a>
         </div>
         <div class="hero-meta">
           <span class="meta-pill">24/7 входящи обаждания</span>
